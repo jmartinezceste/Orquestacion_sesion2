@@ -1,0 +1,116 @@
+resources:
+  jobs:
+    Practica_Final:
+      name: Practica_Final
+      tasks:
+        - task_key: ingestar_aeropuertos
+          spark_python_task:
+            python_file: /Workspace/Users/251104javierceste@gmail.com/IEF_Course1_360degreesDatabricks/IEF_360deg_sesion2/src/01_ingesta_datos_sol.py
+            parameters:
+              - --input_file=/Volumes/sesion2/landing/datos/aeropuertos.csv
+              - --output_table=sesion2.bronze.dim_aeropuertos
+              - --write_mode=overwrite
+              - --partition_by=
+          environment_key: Default
+        - task_key: ingestar_csv_aeronaves
+          spark_python_task:
+            python_file: /Workspace/Users/251104javierceste@gmail.com/IEF_Course1_360degreesDatabricks/IEF_360deg_sesion2/src/01_ingesta_datos_sol.py
+            parameters:
+              - --input_file=/Volumes/sesion2/landing/datos/aeronaves.csv
+              - --output_table=sesion2.bronze.dim_aeronaves
+              - --write_mode=overwrite
+              - --partition_by=
+          environment_key: Default
+        - task_key: ingestar_datos_vuelos
+          spark_python_task:
+            python_file: /Workspace/Users/251104javierceste@gmail.com/IEF_Course1_360degreesDatabricks/IEF_360deg_sesion2/src/01_ingesta_datos_sol.py
+            parameters:
+              - --input_file=/Volumes/sesion2/landing/datos/vuelos_diarios.csv
+              - --output_table=sesion2.bronze.fact_vuelos
+              - --write_mode=overwrite
+              - --partition_by=
+          environment_key: Default
+        - task_key: ingestar_mantenimiento_db
+          spark_python_task:
+            python_file: /Workspace/Users/251104javierceste@gmail.com/IEF_Course1_360degreesDatabricks/IEF_360deg_sesion2/src/01_1_ingestar_datos_aws_sol.py
+            parameters:
+              - --input_file=/Volumes/sesion2/landing/datos/mantenimientos_rds.csv
+              - --output_table=sesion2.bronze.fact_mantenimiento
+              - --write_mode=overwrite
+              - --partition_by=mantenimiento_id
+          environment_key: Default
+        - task_key: validar_datos_aeronaves
+          depends_on:
+            - task_key: ingestar_csv_aeronaves
+          spark_python_task:
+            python_file: /Workspace/Users/251104javierceste@gmail.com/IEF_Course1_360degreesDatabricks/IEF_360deg_sesion2/src/02_validar_datos_sol.py
+            parameters:
+              - --input_table=sesion2.bronze.dim_aeronaves
+              - --output_table=sesion2.silver.dim_aeronaves
+              - --config_path=/Volumes/sesion2/landing/datos/config.json
+              - --table_name=aeronaves
+          environment_key: Default
+        - task_key: validar_datos_aeropuertos
+          depends_on:
+            - task_key: ingestar_aeropuertos
+          spark_python_task:
+            python_file: /Workspace/Users/251104javierceste@gmail.com/IEF_Course1_360degreesDatabricks/IEF_360deg_sesion2/src/02_validar_datos_sol.py
+            parameters:
+              - --input_table=sesion2.bronze.dim_aeropuertos
+              - --output_table=sesion2.silver.dim_aeropuertos
+              - --config_path=/Volumes/sesion2/landing/datos/config.json
+              - --table_name=aeropuertos
+          environment_key: Default
+        - task_key: validar_datos_mantenimiento
+          depends_on:
+            - task_key: ingestar_mantenimiento_db
+          spark_python_task:
+            python_file: /Workspace/Users/251104javierceste@gmail.com/IEF_Course1_360degreesDatabricks/IEF_360deg_sesion2/src/02_validar_datos_sol.py
+            parameters:
+              - --input_table=sesion2.bronze.fact_mantenimiento
+              - --output_table=sesion2.silver.fact_mantenimiento
+              - --config_path=/Volumes/sesion2/landing/datos/config.json
+              - --table_name=mantenimientos
+          environment_key: Default
+        - task_key: costo_mantenimiento
+          depends_on:
+            - task_key: validar_datos_mantenimiento
+            - task_key: validar_datos_aeronaves
+          spark_python_task:
+            python_file: /Workspace/Users/251104javierceste@gmail.com/IEF_Course1_360degreesDatabricks/IEF_360deg_sesion2/src/04_costo_mantenimiento_sol.py
+            parameters:
+              - --aeronaves_table=sesion2.silver.dim_aeronaves
+              - --mantenimiento_table=sesion2.silver.fact_mantenimiento
+              - --output_table=sesion2.gold.costo_mantenimiento
+          environment_key: Default
+        - task_key: validar_datos_vuelos
+          depends_on:
+            - task_key: ingestar_datos_vuelos
+          spark_python_task:
+            python_file: /Workspace/Users/251104javierceste@gmail.com/IEF_Course1_360degreesDatabricks/IEF_360deg_sesion2/src/02_validar_datos_sol.py
+            parameters:
+              - --input_table=sesion2.bronze.fact_vuelos
+              - --output_table=sesion2.silver.fact_vuelos
+              - --config_path=/Volumes/sesion2/landing/datos/config.json
+              - --table_name=vuelos
+          environment_key: Default
+        - task_key: puntualidad_vuelos
+          depends_on:
+            - task_key: validar_datos_aeropuertos
+            - task_key: validar_datos_vuelos
+            - task_key: validar_datos_aeronaves
+          spark_python_task:
+            python_file: /Workspace/Users/251104javierceste@gmail.com/IEF_Course1_360degreesDatabricks/IEF_360deg_sesion2/src/03_puntualidad_vuelos_sol.py
+            parameters:
+              - --vuelos_table=sesion2.silver.fact_vuelos
+              - --aeronaves_table=sesion2.silver.dim_aeronaves
+              - --aeropuertos_table=sesion2.silver.dim_aeropuertos
+              - --output_table=sesion2.gold.puntualidad_vuelos
+          environment_key: Default
+      queue:
+        enabled: true
+      environments:
+        - environment_key: Default
+          spec:
+            client: "2"
+      performance_target: PERFORMANCE_OPTIMIZED
