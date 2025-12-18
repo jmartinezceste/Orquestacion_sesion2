@@ -5,7 +5,7 @@ resources:
       tasks:
         - task_key: ingest_dim_aircraft
           spark_python_task:
-            python_file: /Workspace/Users/251104javierceste@gmail.com/IEF_Course1_360degreesDatabricks/IEF_360deg_sesion4/src/01_ingesta_datos.py
+            python_file: /Workspace/Users/251104javierceste@gmail.com/Orquestacion_sesion2/sesion3/src/01_ingesta_datos.py
             parameters:
               - --input_file=/Volumes/sesion4/layer10_landing/volume/dim_aircraft.csv
               - --output_table=sesion4.layer20_bronze.dim_aircraft
@@ -16,7 +16,7 @@ resources:
           depends_on:
             - task_key: ingest_dim_aircraft
           spark_python_task:
-            python_file: /Workspace/Users/251104javierceste@gmail.com/IEF_Course1_360degreesDatabricks/IEF_360deg_sesion4/src/02_validacion_datos.py
+            python_file: /Workspace/Users/251104javierceste@gmail.com/Orquestacion_sesion2/sesion3/src/02_validacion_datos.py
             parameters:
               - --input_table=sesion4.layer20_bronze.dim_aircraft
               - --output_table=sesion4.layer30_silver.dim_aircraft
@@ -27,7 +27,7 @@ resources:
           environment_key: Default
         - task_key: ingest_dim_phase
           spark_python_task:
-            python_file: /Workspace/Users/251104javierceste@gmail.com/IEF_Course1_360degreesDatabricks/IEF_360deg_sesion4/src/01_ingesta_datos.py
+            python_file: /Workspace/Users/251104javierceste@gmail.com/Orquestacion_sesion2/sesion3/src/01_ingesta_datos.py
             parameters:
               - --input_file=/Volumes/sesion4/layer10_landing/volume/dim_phase.csv
               - --output_table=sesion4.layer20_bronze.dim_phase
@@ -36,7 +36,7 @@ resources:
           environment_key: Default
         - task_key: ingest_dim_sensor_Reading
           spark_python_task:
-            python_file: /Workspace/Users/251104javierceste@gmail.com/IEF_Course1_360degreesDatabricks/IEF_360deg_sesion4/src/01_ingesta_datos.py
+            python_file: /Workspace/Users/251104javierceste@gmail.com/Orquestacion_sesion2/sesion3/src/01_ingesta_datos.py
             parameters:
               - --input_file=/Volumes/sesion4/layer10_landing/volume/dim_sensor_reading.csv
               - --output_table=sesion4.layer20_bronze.dim_sensor_reading
@@ -45,7 +45,7 @@ resources:
           environment_key: Default
         - task_key: ingest_facts_sensors
           spark_python_task:
-            python_file: /Workspace/Users/251104javierceste@gmail.com/IEF_Course1_360degreesDatabricks/IEF_360deg_sesion4/src/01_ingesta_datos.py
+            python_file: /Workspace/Users/251104javierceste@gmail.com/Orquestacion_sesion2/sesion3/src/01_ingesta_datos.py
             parameters:
               - --input_file=/Volumes/sesion4/layer10_landing/volume/fact_sensor.csv
               - --output_table=sesion4.layer20_bronze.fact_engine_sensor
@@ -56,7 +56,7 @@ resources:
           depends_on:
             - task_key: ingest_facts_sensors
           spark_python_task:
-            python_file: /Workspace/Users/251104javierceste@gmail.com/IEF_Course1_360degreesDatabricks/IEF_360deg_sesion4/src/02_validacion_datos.py
+            python_file: /Workspace/Users/251104javierceste@gmail.com/Orquestacion_sesion2/sesion3/src/02_validacion_datos.py
             parameters:
               - --input_table=sesion4.layer20_bronze.fact_engine_sensor
               - --output_table=sesion4.layer30_silver.fact_engine_sensor
@@ -69,7 +69,7 @@ resources:
           depends_on:
             - task_key: ingest_dim_phase
           spark_python_task:
-            python_file: /Workspace/Users/251104javierceste@gmail.com/IEF_Course1_360degreesDatabricks/IEF_360deg_sesion4/src/02_validacion_datos.py
+            python_file: /Workspace/Users/251104javierceste@gmail.com/Orquestacion_sesion2/sesion3/src/02_validacion_datos.py
             parameters:
               - --input_table=sesion4.layer20_bronze.dim_phase
               - --output_table=sesion4.layer30_silver.dim_phase
@@ -82,7 +82,7 @@ resources:
           depends_on:
             - task_key: ingest_dim_sensor_Reading
           spark_python_task:
-            python_file: /Workspace/Users/251104javierceste@gmail.com/IEF_Course1_360degreesDatabricks/IEF_360deg_sesion4/src/02_validacion_datos.py
+            python_file: /Workspace/Users/251104javierceste@gmail.com/Orquestacion_sesion2/sesion3/src/02_validacion_datos.py
             parameters:
               - --input_table=sesion4.layer20_bronze.dim_sensor_reading
               - --output_table=sesion4.layer30_silver.dim_sensor_reading
@@ -98,7 +98,7 @@ resources:
             - task_key: validation_dim_phase
             - task_key: validation_dim_sensor_Reading
           notebook_task:
-            notebook_path: /Workspace/Users/251104javierceste@gmail.com/IEF_Course1_360degreesDatabricks/IEF_360deg_sesion4/src/03_cuarentena_recov_SOL
+            notebook_path: /Workspace/Users/251104javierceste@gmail.com/Orquestacion_sesion2/sesion3/src/03_cuarentena_recov_SOL
             source: WORKSPACE
       queue:
         enabled: true
